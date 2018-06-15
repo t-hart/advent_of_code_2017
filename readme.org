@@ -1,0 +1,2 @@
+* Advent of Code 2017
+  So in an effort to learn ReasonML and work some more on Elm and Rust, I decided I'd try and run through a series of simple code challenges in each of them, and found the advent of code by happenstance. May or may not  get through all of it, but we'll see; it'll be a fun little project nonetheless.
