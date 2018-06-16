@@ -21,3 +21,21 @@ let () =
       expect (sumList [6]) |> toBe 6
   );
 );
+
+  describe "Part two: it considers the digit halfway around the list" (fun () ->
+      test "it loops around" (fun () ->
+          expect (partTwo [ 1; 2; 1; 2 ] ) |> toBe 6
+        );
+      test "It doesn't add if there are no matches" (fun () ->
+          expect (partTwo [ 1; 2; 2; 1 ] ) |> toBe 0
+        );
+      test "It adds longer lists" (fun () ->
+          expect (partTwo [1; 2; 3; 4; 2; 5] ) |> toBe 4
+        );
+      test "It adds all matching values" (fun () ->
+          expect (partTwo [ 1; 2; 3; 1; 2; 3 ] ) |> toBe 12
+        );
+      test "It works" (fun () ->
+          expect (partTwo [ 1; 2; 1; 3; 1; 4; 1; 5 ] ) |> toBe 4
+        );
+    );
