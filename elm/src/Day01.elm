@@ -28,33 +28,17 @@ sumList nums =
             0
 
 
-partTwoHelper : ( Int, Int ) -> ( List Int, List Int ) -> Int -> Int
-partTwoHelper ( cl, cr ) ( l, r ) total =
-    List.map2
-        (\x y ->
-            if x == y then
-                x + y
-            else
-                0
-        )
-        l
-        r
-        |> List.foldl (+) 0
-
-
 partTwo : List Int -> Int
 partTwo nums =
     let
         half =
             (List.length nums) // 2
 
-        addFunc =
-            (\x y ->
-                if x == y then
-                    x + y
-                else
-                    0
-            )
+        add x y =
+            if x == y then
+                x + y
+            else
+                0
     in
-        List.map2 addFunc (List.take half nums) (List.drop half nums)
+        List.map2 add (List.take half nums) (List.drop half nums)
             |> List.foldl (+) 0
