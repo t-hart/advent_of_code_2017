@@ -3,4 +3,5 @@ name = "rust"
 version = "0.1.0"
 authors = ["Thomas Hartmann <thomas.o.hartmann@gmail.com>"]
 
-[dependencies]
+[dev-dependencies]
+# speculate = "0.0.26"
