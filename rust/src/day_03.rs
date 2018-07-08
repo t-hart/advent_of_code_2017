@@ -36,10 +36,6 @@ impl Layer {
     fn offset_from_center(&self, x: Square) -> u32 {
         fn helper(layer: &Layer, corner: u32, square: Square) -> u32 {
             let dist = std::cmp::max(corner, square.get()) - std::cmp::min(corner, square.get());
-            // let dist = square
-            //     .get()
-            //     .checked_sub(corner)
-            //     .unwrap_or(corner - square.get());
             if dist <= layer.index {
                 layer.index - dist
             } else {
@@ -50,13 +46,9 @@ impl Layer {
     }
 
     fn new(index: u32) -> Layer {
-        let end = match index {
-            0 => 1,
-            _ => (1..=index).fold(1, |acc, x| acc + x * 8),
-        };
         Layer {
             index,
-            end: std::num::NonZeroU32::new(end).unwrap(),
+            end: std::num::NonZeroU32::new((0..=index).fold(1, |acc, x| acc + x * 8)).unwrap(),
         }
     }
 }
