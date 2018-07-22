@@ -17,12 +17,12 @@ fn part_one(input_string: &str) -> i32 {
     })
 }
 
-fn get_evenly_divisible(test: &i32, remaining: &[i32]) -> Option<i32> {
+fn get_evenly_divisible(test: i32, remaining: &[i32]) -> Option<i32> {
     match remaining {
         [] => None,
         [x, xs..] => {
-            let max = std::cmp::max(test, x);
-            let min = std::cmp::min(test, x);
+            let max = std::cmp::max(test, *x);
+            let min = std::cmp::min(test, *x);
             match max % min {
                 0 => Some(max / min),
                 _ => get_evenly_divisible(test, xs),
@@ -34,7 +34,7 @@ fn get_evenly_divisible(test: &i32, remaining: &[i32]) -> Option<i32> {
 fn get_res(remaining: &[i32]) -> i32 {
     match remaining {
         [] => 0,
-        [x, xs..] => match get_evenly_divisible(x, xs) {
+        [x, xs..] => match get_evenly_divisible(*x, xs) {
             Some(val) => val,
             None => get_res(xs),
         },

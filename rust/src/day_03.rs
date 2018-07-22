@@ -1,7 +1,10 @@
 use std;
 
+// types
 type Square = std::num::NonZeroU32;
 type LayerIndex = u32;
+
+// part 1
 
 #[derive(Debug, Eq, PartialEq)]
 struct Layer {
@@ -80,13 +83,76 @@ fn get_layer(x: Square) -> Option<Layer> {
     get_layer_helper(Layer::default(), x)
 }
 
-// the number of steps will always be in the range (layer-1) ..= ((layer-1)*2)
-// the distance is equal to (layer - 1) + (distance to middle of row/column)
+fn calculate_mapped(target: u32) -> u32 {
+    let mut map = std::collections::HashMap::new();
+    map.insert((0, 0), 1);
+
+    fn insert_new(index: (i32, i32), map: &mut std::collections::HashMap<(i32, i32), u32>) -> u32 {
+        let value = [
+            (index.0 - 1, index.1 + 1),
+            (index.0, index.1 + 1),
+            (index.0 + 1, index.1 + 1),
+            (index.0 - 1, index.1),
+            (index.0 + 1, index.1),
+            (index.0 - 1, index.1 - 1),
+            (index.0, index.1 - 1),
+            (index.0 + 1, index.1 - 1),
+        ].iter()
+            .filter_map(|key| map.get(key))
+            .sum();
+        map.insert(index, value);
+        value
+    };
+
+    fn find(target: u32, layer: i32, map: &mut std::collections::HashMap<(i32, i32), u32>) -> u32 {
+        // first is (1, 0..1), (2, -1..2), where the y-coordinate goes from -(layer-1) to -layer inclusive
+        for i in (-layer..layer).rev() {
+            let v = insert_new((layer, i), map);
+            if v > target {
+                return v;
+            }
+        }
+
+        // next is from (layer-1, -layer) to (-layer, -layer)
+        for i in (-layer..layer).rev() {
+            let v = insert_new((i, -layer), map);
+            if v > target {
+                return v;
+            }
+        }
+
+        // from (-layer, -layer) to (-layer, layer)
+        for i in -layer + 1..=layer {
+            let v = insert_new((-layer, i), map);
+            if v > target {
+                return v;
+            }
+        }
+
+        // from (-layer, layer) to (layer, layer)
+        for i in -layer + 1..=layer {
+            let v = insert_new((i, layer), map);
+            if v > target {
+                return v;
+            }
+        }
+        find(target, layer + 1, map)
+    }
+    find(target, 1, &mut map)
+}
+
+// execute
 fn part_one(starting_square: Square) -> u32 {
     match get_layer(starting_square) {
         Some(layer) => layer.offset_from_center(starting_square) + layer.index,
         None => 0,
     }
+}
+
+fn part_two(x: u32) -> u32 {
+    calculate_mapped(x)
+    // let first = LayerPt2::first();
+    // compute(x, &first, &mut LayerPt2::next(&first))
 }
 
 #[cfg(test)]
@@ -97,10 +163,10 @@ mod tests {
         std::num::NonZeroU32::new(x).unwrap()
     }
 
-    fn assert_layer(index: u32, start: u32, square: u32) {
+    fn assert_layer(index: u32, end: u32, square: u32) {
         let layer = Layer {
             index,
-            end: non_zero(start),
+            end: non_zero(end),
         };
         assert_eq!(layer, get_layer(non_zero(square)).unwrap());
         assert_eq!(layer, Layer::new(index))
@@ -127,6 +193,20 @@ mod tests {
     #[test]
     fn it_solves_part_one() {
         assert_eq!(475, part_one(non_zero(277678)));
+    }
+
+    #[test]
+    fn part_two_tests() {
+        assert_eq!(351, part_two(330));
+        assert_eq!(330, part_two(329));
+        assert_eq!(806, part_two(747));
+        assert_eq!(747, part_two(746));
+        assert_eq!(2, part_two(1));
+    }
+
+    #[test]
+    fn it_solves_part_two() {
+        assert_eq!(279138, part_two(277678));
     }
 
 }
