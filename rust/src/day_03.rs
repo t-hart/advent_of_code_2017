@@ -84,24 +84,18 @@ fn get_layer(x: Square) -> Option<Layer> {
 }
 
 fn calculate_mapped(target: u32) -> u32 {
+    type Point = (i32, i32);
     let mut map = std::collections::HashMap::new();
     map.insert((0, 0), 1);
 
-    fn scan_layer(
-        target: u32,
-        layer: i32,
-        map: &mut std::collections::HashMap<(i32, i32), u32>,
-    ) -> u32 {
+    fn scan_layer(target: u32, layer: i32, map: &mut std::collections::HashMap<Point, u32>) -> u32 {
         fn scan_layer_helper(
-            map: &mut std::collections::HashMap<(i32, i32), u32>,
+            map: &mut std::collections::HashMap<Point, u32>,
             target: u32,
-            directions: &[(i32, i32)],
-            current_pos: (i32, i32),
+            directions: &[Point],
+            current_pos: Point,
         ) -> Option<u32> {
-            fn insert_new(
-                index: (i32, i32),
-                map: &mut std::collections::HashMap<(i32, i32), u32>,
-            ) -> u32 {
+            fn insert_new(index: Point, map: &mut std::collections::HashMap<Point, u32>) -> u32 {
                 let options = [-1, 0, 1];
                 let value = options
                     .iter()
@@ -126,7 +120,7 @@ fn calculate_mapped(target: u32) -> u32 {
             }
         }
 
-        let directions: Vec<(i32, i32)> = [(0, -1), (-1, 0), (0, 1), (1, 0)]
+        let directions: Vec<Point> = [(0, -1), (-1, 0), (0, 1), (1, 0)]
             .iter()
             .flat_map(|dir| (1..=layer * 2).map(move |_| (dir.0, dir.1)))
             .collect();
