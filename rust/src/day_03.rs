@@ -57,7 +57,7 @@ impl Layer {
 }
 
 fn get_layer(x: Square) -> Option<Layer> {
-    // this means that we can easily find out which layer a square is in by
+    // this means that we can easily scan_layer out which layer a square is in by
     // counting the number of squares in each layer and adding them
     // together until we reach or surpass the number of our square
     fn get_layer_helper(layer: Layer, target: Square) -> Option<Layer> {
@@ -87,58 +87,56 @@ fn calculate_mapped(target: u32) -> u32 {
     let mut map = std::collections::HashMap::new();
     map.insert((0, 0), 1);
 
-    fn insert_new(index: (i32, i32), map: &mut std::collections::HashMap<(i32, i32), u32>) -> u32 {
-        let value = [
-            (index.0 - 1, index.1 + 1),
-            (index.0, index.1 + 1),
-            (index.0 + 1, index.1 + 1),
-            (index.0 - 1, index.1),
-            (index.0 + 1, index.1),
-            (index.0 - 1, index.1 - 1),
-            (index.0, index.1 - 1),
-            (index.0 + 1, index.1 - 1),
-        ].iter()
-            .filter_map(|key| map.get(key))
-            .sum();
-        map.insert(index, value);
-        value
-    };
+    fn scan_layer(
+        target: u32,
+        layer: i32,
+        map: &mut std::collections::HashMap<(i32, i32), u32>,
+    ) -> u32 {
+        fn scan_layer_helper(
+            map: &mut std::collections::HashMap<(i32, i32), u32>,
+            target: u32,
+            directions: &[(i32, i32)],
+            current_pos: (i32, i32),
+        ) -> Option<u32> {
+            fn insert_new(
+                index: (i32, i32),
+                map: &mut std::collections::HashMap<(i32, i32), u32>,
+            ) -> u32 {
+                let options = [-1, 0, 1];
+                let value = options
+                    .iter()
+                    .flat_map(|x| options.iter().map(move |y| (index.0 + x, index.1 + y)))
+                    .filter_map(|key| map.get(&key))
+                    .sum();
+                map.insert(index, value);
+                value
+            };
 
-    fn find(target: u32, layer: i32, map: &mut std::collections::HashMap<(i32, i32), u32>) -> u32 {
-        // first is (1, 0..1), (2, -1..2), where the y-coordinate goes from -(layer-1) to -layer inclusive
-        for i in (-layer..layer).rev() {
-            let v = insert_new((layer, i), map);
-            if v > target {
-                return v;
+            match directions {
+                [x, xs..] => {
+                    let new_pos = (current_pos.0 + x.0, current_pos.1 + x.1);
+                    let v = insert_new(new_pos, map);
+                    if v > target {
+                        Some(v)
+                    } else {
+                        scan_layer_helper(map, target, xs, new_pos)
+                    }
+                }
+                [] => None,
             }
         }
 
-        // next is from (layer-1, -layer) to (-layer, -layer)
-        for i in (-layer..layer).rev() {
-            let v = insert_new((i, -layer), map);
-            if v > target {
-                return v;
-            }
-        }
+        let directions: Vec<(i32, i32)> = [(0, -1), (-1, 0), (0, 1), (1, 0)]
+            .iter()
+            .flat_map(|dir| (1..=layer * 2).map(move |_| (dir.0, dir.1)))
+            .collect();
 
-        // from (-layer, -layer) to (-layer, layer)
-        for i in -layer + 1..=layer {
-            let v = insert_new((-layer, i), map);
-            if v > target {
-                return v;
-            }
+        match scan_layer_helper(map, target, &directions, (layer, layer)) {
+            Some(v) => v,
+            None => scan_layer(target, layer + 1, map),
         }
-
-        // from (-layer, layer) to (layer, layer)
-        for i in -layer + 1..=layer {
-            let v = insert_new((i, layer), map);
-            if v > target {
-                return v;
-            }
-        }
-        find(target, layer + 1, map)
     }
-    find(target, 1, &mut map)
+    scan_layer(target, 1, &mut map)
 }
 
 // execute

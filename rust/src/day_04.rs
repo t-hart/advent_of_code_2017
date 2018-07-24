@@ -10,33 +10,30 @@ fn execute(input: &str, map: fn(&str) -> bool) -> usize {
 }
 
 fn part_one(input: &str) -> usize {
-    execute(input, validate)
+    execute(input, validate_1)
 }
 
 fn part_two(input: &str) -> usize {
     execute(input, validate_2)
 }
 
-fn validate(passphrase: &str) -> bool {
+fn validate(passphrase: &str, transform: fn(&str) -> String) -> bool {
     let mut set = std::collections::HashSet::new();
-    for word in passphrase.split_whitespace() {
-        if !set.insert(word) {
-            return false;
-        }
-    }
-    true
+    passphrase
+        .split_whitespace()
+        .all(|word| set.insert(transform(word)))
+}
+
+fn validate_1(passphrase: &str) -> bool {
+    validate(passphrase, |x| x.to_string())
 }
 
 fn validate_2(passphrase: &str) -> bool {
-    let mut set = std::collections::HashSet::new();
-    for word in passphrase.split_whitespace() {
+    validate(passphrase, |word| {
         let mut chars: Vec<char> = word.chars().collect();
         chars.sort();
-        if !set.insert(chars.iter().collect::<String>()) {
-            return false;
-        }
-    }
-    true
+        chars.iter().collect()
+    })
 }
 
 #[cfg(test)]
@@ -44,9 +41,9 @@ mod tests {
     use super::*;
     #[test]
     fn test_validity() {
-        assert!(validate("aa bb cc dd ee"));
-        assert!(!validate("aa bb cc dd aa"));
-        assert!(validate("aa bb cc dd aaa"));
+        assert!(validate_1("aa bb cc dd ee"));
+        assert!(!validate_1("aa bb cc dd aa"));
+        assert!(validate_1("aa bb cc dd aaa"));
     }
 
     #[test]
