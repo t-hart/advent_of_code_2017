@@ -12,11 +12,7 @@ fn part_one(target: std::num::NonZeroU32) -> u32 {
     }
 }
 
-fn part_two(x: u32) -> u32 {
-    calculate_mapped(x)
-}
-
-fn calculate_mapped(target: u32) -> u32 {
+fn part_two(target: u32) -> u32 {
     type Point = (i32, i32);
     let mut map = std::collections::HashMap::new();
     map.insert((0, 0), 1);
