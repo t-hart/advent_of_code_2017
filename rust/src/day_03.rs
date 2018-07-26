@@ -1,14 +1,16 @@
 use std;
 
 fn part_one(target: std::num::NonZeroU32) -> u32 {
-    let target = target.get() as i64;
-    let sqrt_upper = match (target as f64).sqrt().ceil() as i64 {
-        x if x % 2 == 0 => x + 1,
-        x => x,
-    };
-    match sqrt_upper - 1 {
-        0 => 0,
-        x => (x - (sqrt_upper * sqrt_upper - target) % x) as u32,
+    match target.get() {
+        1 => 0,
+        target => {
+            let (sqrt_upper, max_dist) = {
+                let intermediate = (f64::from(target)).sqrt().ceil() as u32;
+                let rem = intermediate % 2;
+                (intermediate + 1 - rem, intermediate - rem)
+            };
+            max_dist - (sqrt_upper * sqrt_upper - target) % max_dist
+        }
     }
 }
 
@@ -61,6 +63,7 @@ fn part_two(target: u32) -> u32 {
     }
     scan_layer(target, 1, &mut map)
 }
+
 #[cfg(test)]
 mod tests {
     use super::*;
