@@ -1,3 +1,4 @@
+use num;
 use std;
 
 fn part_one(target: std::num::NonZeroU32) -> u32 {
@@ -10,6 +11,31 @@ fn part_one(target: std::num::NonZeroU32) -> u32 {
                 (intermediate + 1 - rem, intermediate - rem)
             };
             max_dist - (sqrt_upper * sqrt_upper - target) % max_dist
+        }
+    }
+}
+
+fn part_one_generic<T>(target: T) -> Option<T>
+where
+    T: num::Unsigned + num::Integer + num::NumCast + Copy,
+{
+    let zero = num::Zero::zero();
+    let one = num::One::one();
+    match target {
+        _ if target == zero => None,
+        _ if target == one => Some(zero),
+        _ => {
+            let (sqrt_upper, max_dist) = {
+                num::NumCast::from(target)
+                    .and_then(|x: f64| {
+                        num::NumCast::from(x.sqrt().ceil()).and_then(|intermediate: T| {
+                            let rem = intermediate % (one + one);
+                            Some((intermediate + one - rem, intermediate - rem))
+                        })
+                    })
+                    .unwrap_or((zero, zero))
+            };
+            Some(max_dist - (sqrt_upper * sqrt_upper - target) % max_dist)
         }
     }
 }
@@ -81,8 +107,22 @@ mod tests {
     }
 
     #[test]
+    fn part_one_generic_tests() {
+        assert_eq!(None, part_one_generic(0_u32));
+        assert_eq!(Some(0), part_one_generic(1_u32));
+        assert_eq!(Some(3), part_one_generic(12_u32));
+        assert_eq!(Some(2), part_one_generic(23_u32));
+        assert_eq!(Some(31), part_one_generic(1024_u32));
+    }
+
+    #[test]
     fn it_solves_part_one() {
         assert_eq!(475, part_one(non_zero(277678)));
+    }
+
+    #[test]
+    fn it_solves_part_one_generic() {
+        assert_eq!(Some(475), part_one_generic(277678_u32));
     }
 
     #[test]

@@ -1,6 +1,7 @@
 #![feature(slice_patterns, plugin)]
 #![allow(dead_code)]
 extern crate core;
+extern crate num;
 
 mod day_01;
 mod day_02;

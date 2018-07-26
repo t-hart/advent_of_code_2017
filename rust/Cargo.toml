@@ -5,3 +5,6 @@ authors = ["Thomas Hartmann <thomas.o.hartmann@gmail.com>"]
 
 [dev-dependencies]
 # speculate = "0.0.26"
+
+[dependencies]
+num = "0.2"
