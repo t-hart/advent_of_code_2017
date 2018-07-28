@@ -52,24 +52,26 @@ fn part_two(target: u32) -> u32 {
             directions: &[Point],
             current_pos: Point,
         ) -> Option<u32> {
-            fn insert_new(index: Point, map: &mut std::collections::HashMap<Point, u32>) -> u32 {
-                let options = [-1, 0, 1];
-                let value = options
+            fn calc_pos_value(
+                index: Point,
+                map: &mut std::collections::HashMap<Point, u32>,
+            ) -> u32 {
+                const OPTIONS: [i32; 3] = [-1, 0, 1];
+                OPTIONS
                     .iter()
-                    .flat_map(|x| options.iter().map(move |y| (index.0 + x, index.1 + y)))
+                    .flat_map(|x| OPTIONS.iter().map(move |y| (index.0 + x, index.1 + y)))
                     .filter_map(|key| map.get(&key))
-                    .sum();
-                map.insert(index, value);
-                value
+                    .sum()
             };
 
             match directions {
                 [x, xs..] => {
                     let new_pos = (current_pos.0 + x.0, current_pos.1 + x.1);
-                    let v = insert_new(new_pos, map);
+                    let v = calc_pos_value(new_pos, map);
                     if v > target {
                         Some(v)
                     } else {
+                        map.insert(new_pos, v);
                         scan_layer_helper(map, target, xs, new_pos)
                     }
                 }
@@ -93,6 +95,7 @@ fn part_two(target: u32) -> u32 {
 #[cfg(test)]
 mod tests {
     use super::*;
+    const PUZZLE_INPUT: u32 = 277678;
 
     fn non_zero(x: u32) -> std::num::NonZeroU32 {
         std::num::NonZeroU32::new(x).unwrap()
@@ -117,12 +120,12 @@ mod tests {
 
     #[test]
     fn it_solves_part_one() {
-        assert_eq!(475, part_one(non_zero(277678)));
+        assert_eq!(475, part_one(non_zero(PUZZLE_INPUT)));
     }
 
     #[test]
     fn it_solves_part_one_generic() {
-        assert_eq!(Some(475), part_one_generic(277678_u32));
+        assert_eq!(Some(475), part_one_generic(PUZZLE_INPUT));
     }
 
     #[test]
@@ -136,7 +139,7 @@ mod tests {
 
     #[test]
     fn it_solves_part_two() {
-        assert_eq!(279138, part_two(277678));
+        assert_eq!(279138, part_two(PUZZLE_INPUT));
     }
 
 }
