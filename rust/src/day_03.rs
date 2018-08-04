@@ -42,9 +42,6 @@ where
 
 fn part_two(target: u32) -> u32 {
     type Point = (i32, i32);
-    let mut map = std::collections::HashMap::new();
-    map.insert((0, 0), 1);
-
     fn scan_layer(target: u32, layer: i32, map: &mut std::collections::HashMap<Point, u32>) -> u32 {
         fn scan_layer_helper(
             map: &mut std::collections::HashMap<Point, u32>,
@@ -52,22 +49,15 @@ fn part_two(target: u32) -> u32 {
             directions: &[Point],
             current_pos: Point,
         ) -> Option<u32> {
-            fn calc_pos_value(
-                index: Point,
-                map: &mut std::collections::HashMap<Point, u32>,
-            ) -> u32 {
-                const OPTIONS: [i32; 3] = [-1, 0, 1];
-                OPTIONS
-                    .iter()
-                    .flat_map(|x| OPTIONS.iter().map(move |y| (index.0 + x, index.1 + y)))
-                    .filter_map(|key| map.get(&key))
-                    .sum()
-            };
-
+            const OPTIONS: [i32; 3] = [-1, 0, 1];
             match directions {
                 [x, xs..] => {
                     let new_pos = (current_pos.0 + x.0, current_pos.1 + x.1);
-                    let v = calc_pos_value(new_pos, map);
+                    let v = OPTIONS
+                        .iter()
+                        .flat_map(|x| OPTIONS.iter().map(move |y| (new_pos.0 + x, new_pos.1 + y)))
+                        .filter_map(|key| map.get(&key))
+                        .sum();
                     if v > target {
                         Some(v)
                     } else {
@@ -89,6 +79,9 @@ fn part_two(target: u32) -> u32 {
             None => scan_layer(target, layer + 1, map),
         }
     }
+
+    let mut map = std::collections::HashMap::new();
+    map.insert((0, 0), 1);
     scan_layer(target, 1, &mut map)
 }
 
