@@ -41,4 +41,4 @@ partTwo nums =
                 0
     in
         List.map2 add (List.take half nums) (List.drop half nums)
-            |> List.foldl (+) 0
+            |> List.sum
