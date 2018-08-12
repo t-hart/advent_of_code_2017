@@ -1,18 +1,16 @@
 module Day01 where
 
+solve :: (Eq a, Num b) => ((a, a) -> b) -> [a] -> [a] -> b
+solve f xs ys = sum . map f . filter (uncurry (==)) $ zip xs ys
+
 partOne :: (Num a, Eq a) => [a] -> a
 partOne [] = 0
-partOne (x:xs) = sumList const $ zip <*> tail $ (x : xs ++ [x])
+partOne xs = solve fst xs shifted
+  where
+    shifted = tail $ cycle xs
 
 partTwo :: (Num a, Eq a) => [a] -> a
-partTwo xs = sumList (+) $ uncurry zip $ splitAt half xs
+partTwo xs = solve ((* 2) . fst) start end
   where
     half = length xs `div` 2
-
-sumList :: (Num a, Eq a) => (a -> a -> a) -> [(a, a)] -> a
-sumList eval = foldl (\acc x -> acc + f x) 0
-  where
-    f (a, b) =
-      if a == b
-        then eval a b
-        else 0
+    (start, end) = splitAt half xs
