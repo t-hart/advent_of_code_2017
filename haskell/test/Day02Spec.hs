@@ -20,7 +20,7 @@ partTwoSpec =
   describe "Part two" $ do
     it "works" $
       partTwo "5\t9\t2\t8\n9\t4\t7\t3\n3\t8\t6\t5" `shouldBe` (9 :: Int)
-    it "selves the puzzle" $ partTwo puzzleInput `shouldBe` (258 :: Int)
+    it "solves the puzzle" $ partTwo puzzleInput `shouldBe` (258 :: Int)
 
 puzzleInput :: String
 puzzleInput =
