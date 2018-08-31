@@ -32,8 +32,7 @@ where
                             let rem = intermediate % (one + one);
                             Some((intermediate + one - rem, intermediate - rem))
                         })
-                    })
-                    .unwrap_or((zero, zero))
+                    }).unwrap_or((zero, zero))
             };
             Some(max_dist - (sqrt_upper * sqrt_upper - target) % max_dist)
         }
@@ -74,10 +73,8 @@ fn part_two(target: u32) -> u32 {
             .flat_map(|dir| (1..=layer * 2).map(move |_| (dir.0, dir.1)))
             .collect();
 
-        match scan_layer_helper(map, target, &directions, (layer, layer)) {
-            Some(v) => v,
-            None => scan_layer(target, layer + 1, map),
-        }
+        scan_layer_helper(map, target, &directions, (layer, layer))
+            .unwrap_or_else(|| scan_layer(target, layer + 1, map))
     }
 
     let mut map = std::collections::HashMap::new();
