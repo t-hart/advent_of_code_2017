@@ -29,5 +29,5 @@ partTwo = escape 0 0 f . toMaze
   where
     f x =
       if x >= 3
-        then (-)
+        then flip (-)
         else (+)
